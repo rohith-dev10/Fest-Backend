@@ -1,5 +1,19 @@
-const { ObjectID } = require('bson');
 const mongoose = require('mongoose');
+const ObjectID = mongoose.Types.ObjectId;
+
+const participate = new mongoose.Schema({
+    eventname:{
+        type: String,
+        required: true,
+    },
+    teamid: {
+        type:ObjectID,
+        required:true
+    },
+    teamname:{
+        type: String
+    }
+})
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -15,21 +29,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    teams: {
-        type: [{
-            _id: {
-                type:ObjectID,
-                required:true
-            },
-            eventname:{
-                type: String,
-                required: true,
-            },
-            teamname:{
-                type: String
-            }
-        }]
+    participation: {
+        type: [{ref:participate}]
     }
 }, { timestamps: true })
 
-module.exports = mongoose.model('Admin', UserSchema)
+module.exports = mongoose.model('User', UserSchema)
+
+// {"_id":{"$oid":"63bcc27f43462147040cbea9"},"name":"Rohith","email":"rohith@gmail.com","password":"Password","participation":[{"eventname":"AAAA","teamid":{"$oid":"63bcc2e743462147040cbeaa"},"teamname":""},{"eventname":"BBBB","teamid":{"$oid":"63bcc36b43462147040cbeab"},"teamname":"SADASD"}]}
