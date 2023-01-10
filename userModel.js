@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const ObjectID = mongoose.Types.ObjectId;
 
 const participate = new mongoose.Schema({
+    eventid: {
+        type:ObjectID,
+        required:true
+    },
     eventname:{
         type: String,
         required: true,

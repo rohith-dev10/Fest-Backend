@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const TeamSchema = new mongoose.Schema({
-    name: {
+    eventid:{
+        type:mongoose.Types.ObjectId,
+        required:true
+    },
+    teamname: {
         type: String,
     },
     emails: {
@@ -9,12 +13,25 @@ const TeamSchema = new mongoose.Schema({
             email: {
                 type:String,
                 required:true
+            },
+            name:{
+                type:String,
+                required:true
             }
         }],
         required: true,
     },
     leader:{
-        type:String,
+        type:{
+            email: {
+                type:String,
+                required:true
+            },
+            name:{
+                type:String,
+                required:true
+            }
+        },
         required:true
     }
 }, { timestamps: true })
