@@ -1,23 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Types.ObjectId;
 
-const participate = new mongoose.Schema({
-    eventid: {
-        type:ObjectID,
-        required:true
-    },
-    eventname:{
-        type: String,
-        required: true,
-    },
-    teamid: {
-        type:ObjectID,
-        required:true
-    },
-    teamname:{
-        type: String
-    }
-})
+// const participate = new mongoose.Schema()
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -34,7 +18,24 @@ const UserSchema = new mongoose.Schema({
         required: true,
     },
     participation: {
-        type: [{ref:participate}]
+        type: [{
+            eventid: {
+                type:ObjectID,
+                required:true
+            },
+            eventname:{
+                type: String,
+                required: true,
+            },
+            teamid: {
+                type:ObjectID,
+                required:true
+            },
+            teamname:{
+                type: String
+            }
+        }],
+        default:[]
     }
 }, { timestamps: true })
 
