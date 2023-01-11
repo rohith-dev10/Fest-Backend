@@ -1,0 +1,29 @@
+{
+  "name": "fest-backend",
+  "version": "1.0.0",
+  "description": "This is a technical fest website of iiitv-icd",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rohith-dev10/Fest-Backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rohith-dev10/Fest-Backend/issues"
+  },
+  "homepage": "https://github.com/rohith-dev10/Fest-Backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bson": "^4.7.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-validator": "^6.14.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.8.3",
+    "nodemon": "^2.0.20"
+  }
+}
