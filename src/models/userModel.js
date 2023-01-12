@@ -29,7 +29,6 @@ const UserSchema = new mongoose.Schema({
             },
             teamid: {
                 type:ObjectID,
-                required:true
             },
             teamname:{
                 type: String
