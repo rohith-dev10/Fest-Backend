@@ -1,15 +1,18 @@
-//team-event-register
-//body- {email,}
+//get
+//  showevents
+//  showevent
 
-//individual-event-register
-//
+//post
+//  event-register
+//      body- {teamname,leaderemail,email1....}
+
 
 const express = require('express');
 const router = express.Router();
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
 const events = require("../models/eventModel");
-const { default: mongoose } = require('mongoose');
+const mongoose= require('mongoose');
 
 router.get("/",(req,res)=>{
     res.send("Hey");
