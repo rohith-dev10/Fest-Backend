@@ -7,6 +7,34 @@ const teams     = require("../models/teamModel");
 const events    = require("../models/eventModel");
 const fetchuser = require("../middleware/FetchUser");
 
+const {isValidObjectId , mailRegex, isValid, teamnameRegex } = require("../validators/validations");
+
+router.get("/",async(req,res)=>{
+    const event=await events.findOne({_id: mongoose.Types.ObjectId("63bd16e928ac135bf1dd1ddb")});
+    var evedt = event.eventdate;
+    var eveenddt = event.eventenddate;
+    var nowdt = new Date();
+    var ed=new Date(evedt);
+    var eed=new Date(eveenddt);
+    var nd=new Date(nowdt);
+    if(ed.setHours(0,0,0,0)>nd.setHours(0,0,0,0)){
+        return res.send({status:"Upcoming"});
+    }
+    ed=new Date(evedt);
+    nd=new Date(nowdt);
+    if(ed.setHours(0,0,0,0)==nd.setHours(0,0,0,0)){
+        ed=new Date(evedt);
+        nd=new Date(nowdt);
+        if(ed>nd){
+            return res.send({status:"Today"});
+        }
+    }
+    nd=new Date(nowdt);
+    if(eed<nd){
+        return res.send({status:"Completed"});
+    }
+    return res.send({status:"Ongoing"});
+})
 
 router.get("/userdashboard", fetchuser ,async (req,res)=>{
     const userid=req.user.id;
@@ -22,7 +50,33 @@ router.get("/userdashboard", fetchuser ,async (req,res)=>{
             var part={};
             var participate=participation[i];
             const event=await events.findOne({_id:participate.eventid});
-            let status; // upcoming today ongoing completed //
+            let status;
+            
+            var evedt = event.eventdate;
+            var eveenddt = event.eventenddate;
+            var nowdt = new Date();
+            var ed=new Date(evedt);
+            var eed=new Date(eveenddt);
+            var nd=new Date(nowdt);
+            if(ed.setHours(0,0,0,0)>nd.setHours(0,0,0,0)){
+                status="Upcoming";
+            }
+            ed=new Date(evedt);
+            nd=new Date(nowdt);
+            if(ed.setHours(0,0,0,0)==nd.setHours(0,0,0,0)){
+                ed=new Date(evedt);
+                nd=new Date(nowdt);
+                if(ed>nd){
+                    status="Today";
+                }
+            }
+            nd=new Date(nowdt);
+            if(eed<nd){
+                status="Completed";
+            }
+            status="Ongoing";
+
+            delete evedt,eveenddt,nowdt,ed,eed,nd;
             
             part["eventname"]=event.eventname;
             part["eventstatus"]=status;
@@ -41,18 +95,22 @@ router.get("/userdashboard", fetchuser ,async (req,res)=>{
             else indpart.push(part);
         }
         
-        res.status(200).send({name:user.name,indpart,teampart,});
+        return res.status(200).send({name:user.name,indpart,teampart,});
     }
     catch (error) {
         console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        return res.status(500).send("Internal Server Error");
     }
 })
 
 
-router.post("/eventregister/:eventid" , fetchuser ,  async (req,res)=>{ // middleware to authenticate and authorise user
+router.post("/eventregister/:eventid" , fetchuser ,  async (req,res)=>{
     const userid=req.user.id;
     const eventid=req.params.eventid;
+
+    if(!isValidObjectId(eventid)){
+        return res.status(400).send({ status: false, message: "Please provide a valid event id" });
+    }
 
     try{
         const event= await events.findOne({_id:eventid});
@@ -75,12 +133,28 @@ router.post("/eventregister/:eventid" , fetchuser ,  async (req,res)=>{ // middl
         var emails=[];
         var team;
 
-        if(event.eventtype=="team"){// team participation
+        if(event.eventtype=="team"){
             let body=req.body;
+
+            if(!isValid(body.teamname)){
+                return res.status(400).send({ status: false, message: "Team Name cannot be Empty" });
+            }
+            if(!teamnameRegex(body.teamname)){
+                return res.status(400).send({ status: false, message: "Not a valid Team Name" });
+            }
+
             teamname=body.teamname;
             delete body["teamname"];
             delete body["leaderemail"];
             for( var key in body){
+                
+                if(!isValid(body[key])){
+                    return res.status(400).send({ status: false, message: "Email Field cannot be empty" });
+                }
+                if(!mailRegex(body[key])){
+                    return res.status(400).send({ status: false, message: "Enter a valid Email" });
+                }
+
                 var usr= await users.findOne({email:body[key]});
 
                 if(!usr) return res.status(400).send({ status: false, message: `${key} is not Registered` });
@@ -114,8 +188,10 @@ router.post("/eventregister/:eventid" , fetchuser ,  async (req,res)=>{ // middl
                     teamname:teamname
                 };
                 participation=[...participation,participate];
+
                 usr.set({participation:participation});
                 await usr.save();
+                
                 emails.push({email:body["email"+i],name:usr.name});
                 delete body["email"+i];
             }
@@ -142,7 +218,7 @@ router.post("/eventregister/:eventid" , fetchuser ,  async (req,res)=>{ // middl
     }
     catch (error) {
         console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        return res.status(500).send("Internal Server Error");
     }
 })
 
