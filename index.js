@@ -1,11 +1,12 @@
 const express    = require('express');
-const cors    = require('cors');
+const cors       = require('cors');
 const router     = require('./src/routes/route.js');
 const authrouter = require('./src/routes/Routes.js');
 const mongoose   = require('mongoose');
 
 mongoose.set('strictQuery', true);
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
